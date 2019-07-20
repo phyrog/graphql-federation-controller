@@ -4,11 +4,14 @@
 
 replicaCount: 1
 
+schemaName: "main"
+
 controller:
   image:
     repository: phyrog/graphql-federation-controller
     tag: stable
     pullPolicy: IfNotPresent
+  
 endpoint-reloader:
   image:
     repository: phyrog/graphql-federation-endpoint-reloader
