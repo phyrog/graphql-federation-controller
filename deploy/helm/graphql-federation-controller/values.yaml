@@ -4,10 +4,16 @@
 
 replicaCount: 1
 
-image:
-  repository: phyrog/graphql-federation-controller
-  tag: stable
-  pullPolicy: IfNotPresent
+controller:
+  image:
+    repository: phyrog/graphql-federation-controller
+    tag: stable
+    pullPolicy: IfNotPresent
+endpoint-reloader:
+  image:
+    repository: phyrog/graphql-federation-endpoint-reloader
+    tag: stable
+    pullPolicy: IfNotPresent
 
 imagePullSecrets: []
 nameOverride: ""

@@ -7,7 +7,7 @@ metadata:
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
-    matchLabels:
+  matchLabels:
       app.kubernetes.io/name: {{ include "graphql-federation-controller.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
   template:
@@ -22,8 +22,8 @@ spec:
     {{- end }}
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ .Values.controller.image.repository }}:{{ .Values.controller.image.tag }}"
+          imagePullPolicy: {{ .Values.controller.image.pullPolicy }}
           ports:
             - name: http
               containerPort: 80
@@ -38,6 +38,27 @@ spec:
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: endpoint-config
+              mountPath: /endpoint-config
+        - name: endpoint-reloader
+          image: "{{ .Values.endpoint-reloader.image.repository }}:{{ .Values.endpoint-reloader.image.tag }}"
+          imagePullPolicy: {{ .Values.endpoint-reloader.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          volumeMounts:
+            - name: endpoint-config
+              mountPath: /endpoint-config
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -50,3 +71,6 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+      volumes:
+        - name: endpoint-config
+          emptyDir: {}
