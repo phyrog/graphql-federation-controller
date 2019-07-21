@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/julienschmidt/httprouter"
 
@@ -78,7 +79,7 @@ func serviceHandler(w http.ResponseWriter, r *http.Request, params httprouter.Pa
 	service := types.NamespacedName{Namespace: params.ByName("namespace"), Name: params.ByName("service")}
 	backend := memoryStore[service]
 	msg, err := json.Marshal(BackendService{
-		URL:               backend.Protocol + "://" + backend.Endpoint + ":" + string(backend.Port) + backend.Path,
+		URL:               backend.Protocol + "://" + backend.Endpoint + ":" + strconv.Itoa(int(backend.Port)) + backend.Path,
 		PartialSchemaPath: "schema/" + service.String(),
 	})
 	if err != nil {
