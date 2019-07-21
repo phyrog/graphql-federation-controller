@@ -13,6 +13,6 @@ const server = new ApolloServer({
     endpointUrl: "http://localhost:8000"
   }
 });
-server.listen().then(({url}) => {
+server.listen({ port: 4000 }).then(({ url }) => {
   console.log(`Listening to ${url}.`);
 });
