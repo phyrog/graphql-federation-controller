@@ -8,14 +8,14 @@ schemaName: "main"
 
 controller:
   image:
-    repository: phyrog/graphql-federation-controller
-    tag: stable
+    repository: quay.io/phyrog/graphql-federation-controller
+    tag: latest
     pullPolicy: IfNotPresent
   
 gateway:
   image:
-    repository: phyrog/graphql-federation-gateway
-    tag: stable
+    repository: quay.io/phyrog/graphql-federation-controller
+    tag: latest
     pullPolicy: IfNotPresent
 
 imagePullSecrets: []

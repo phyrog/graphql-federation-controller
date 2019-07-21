@@ -160,11 +160,12 @@ func (r *ServiceReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		endpointURL := buildGraphQLEndpointURL(config)
 		log.Info(config.PartialName + ": " + endpointURL)
 
-		payload := []byte(`{"query":"{_service{sdl}}", "operationName": "GetPartialSchema", "variables": {}}`)
+		payload := []byte(`{"query":"{_service{sdl}}"}`)
 		log.Info(string(payload))
 
 		req, err := http.NewRequest("POST", endpointURL, bytes.NewBuffer(payload))
-		log.Info("hello")
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Accept", "application/json")
 
 		client := &http.Client{}
 		resp, err := client.Do(req)
