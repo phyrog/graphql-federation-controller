@@ -29,8 +29,8 @@ func UpdateMessageListener(updateChannel chan UpdateMessage, log logr.Logger) {
 }
 
 type ImplementingServiceLocation struct {
-	Name string
-	Path string
+	Name string `json:"name"`
+	Path string `json:"path"`
 }
 
 type BackendConfig struct {
