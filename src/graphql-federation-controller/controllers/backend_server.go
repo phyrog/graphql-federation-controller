@@ -25,6 +25,7 @@ func UpdateMessageListener(updateChannel chan UpdateMessage, log logr.Logger) {
 
 func secretHandler(w http.ResponseWriter, r *http.Request) {
 	msg, _ := json.Marshal(memoryStore)
+	w.WriteHeader(200)
 	fmt.Fprintf(w, string(msg))
 }
 
@@ -32,5 +33,5 @@ func StartWebserver(updateChannel chan UpdateMessage, log logr.Logger) {
 	go UpdateMessageListener(updateChannel, log)
 
 	http.HandleFunc("/", secretHandler)
-	log.Error(http.ListenAndServe(":8080", nil), "")
+	log.Error(http.ListenAndServe(":8000", nil), "")
 }
