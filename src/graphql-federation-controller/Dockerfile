@@ -20,5 +20,6 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -a -o manager 
 # Refer to https://github.com/GoogleContainerTools/distroless for more details
 FROM gcr.io/distroless/static:latest
 WORKDIR /
+EXPOSE 8080
 COPY --from=builder /workspace/manager .
 ENTRYPOINT ["/manager"]
