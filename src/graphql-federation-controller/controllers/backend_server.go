@@ -127,6 +127,16 @@ func configLinkHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Para
 	}
 }
 
+type Logger struct {
+	handler http.Handler
+	log     logr.Logger
+}
+
+func (l *Logger) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	l.log.Info(r.Method + ": " + r.URL.Path)
+	l.handler.ServeHTTP(w, r)
+}
+
 func StartWebserver(updateChannel chan UpdateMessage, log logr.Logger) {
 	go UpdateMessageListener(updateChannel, log)
 
@@ -137,5 +147,5 @@ func StartWebserver(updateChannel chan UpdateMessage, log logr.Logger) {
 	router.GET("/partial/secret/:graphvariant/v:federationversion/composition-config-link", configLinkHandler)
 	router.GET("/secret/:graphid/storage-secret/:apikeyhash.json", secretHandler)
 
-	log.Error(http.ListenAndServe(":8000", router), "")
+	log.Error(http.ListenAndServe(":8000", &Logger{handler: router, log: log}), "")
 }
