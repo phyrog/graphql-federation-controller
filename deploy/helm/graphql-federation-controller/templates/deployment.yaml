@@ -38,12 +38,9 @@ spec:
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          volumeMounts:
-            - name: endpoint-config
-              mountPath: /endpoint-config
         - name: endpoint-reloader
-          image: "{{ .Values.endpoint-reloader.image.repository }}:{{ .Values.endpoint-reloader.image.tag }}"
-          imagePullPolicy: {{ .Values.endpoint-reloader.image.pullPolicy }}
+          image: "{{ .Values.gateway.image.repository }}:{{ .Values.gateway.image.tag }}"
+          imagePullPolicy: {{ .Values.gateway.image.pullPolicy }}
           ports:
             - name: http
               containerPort: 80
@@ -56,9 +53,6 @@ spec:
             httpGet:
               path: /
               port: http
-          volumeMounts:
-            - name: endpoint-config
-              mountPath: /endpoint-config
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -71,6 +65,3 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-      volumes:
-        - name: endpoint-config
-          emptyDir: {}

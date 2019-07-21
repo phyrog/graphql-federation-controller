@@ -12,9 +12,9 @@ controller:
     tag: stable
     pullPolicy: IfNotPresent
   
-endpoint-reloader:
+gateway:
   image:
-    repository: phyrog/graphql-federation-endpoint-reloader
+    repository: phyrog/graphql-federation-gateway
     tag: stable
     pullPolicy: IfNotPresent
 

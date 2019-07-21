@@ -1,0 +1,3 @@
+version: "2"
+domain: phyrog.com
+repo: graphql-federation-controller
