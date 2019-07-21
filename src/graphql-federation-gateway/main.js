@@ -24,11 +24,11 @@ server = new ApolloServer({
   gateway: gateway,
   subscriptions: false,
   engine: {
-    apiKey: "foobar:baz:boo",
-    graphId: "foobar",
-    apiKeyHash: "foobar",
-    graphVariant: "foobar",
-    endpointUrl: "http://localhost:3000"
+    apiKey: "secret:api:key",
+    graphId: "graphId",
+    apiKeyHash: "apiKeyHash",
+    graphVariant: "graphVariant",
+    endpointUrl: "http://localhost:8000"
   }
 });
 server.listen().then(url => {
