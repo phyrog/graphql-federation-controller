@@ -32,6 +32,13 @@ spec:
           imagePullPolicy: {{ .Values.gateway.image.pullPolicy }}
           ports:
             - containerPort: 4000
+          env:
+            - name: ENGINE_API_KEY
+              value: secret
+            - name: APOLLO_PARTIAL_SCHEMA_BASE_URL
+              value: http://localhost:8000/partial/
+            - name: APOLLO_STORAGE_SECRET_BASE_URL
+              value: http://localhost:8000/secret/
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
