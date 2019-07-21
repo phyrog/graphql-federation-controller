@@ -64,11 +64,15 @@ func main() {
 		os.Exit(1)
 	}
 
+	updateChannel := make(chan controllers.UpdateMessage)
+	go controllers.StartWebserver(updateChannel, ctrl.Log.WithName("controllers").WithName("Webserver"))
+
 	if err = (&controllers.ServiceReconciler{
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("Service"),
 		Config: controllers.ServiceReconcilerConfig{
-			SchemaName: schemaName,
+			SchemaName:    schemaName,
+			UpdateChannel: updateChannel,
 		},
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Service")

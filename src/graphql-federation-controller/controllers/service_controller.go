@@ -42,7 +42,8 @@ type ServiceReconciler struct {
 
 // ServiceReconcilerConfig is used to configure the ServiceReconciler
 type ServiceReconcilerConfig struct {
-	SchemaName string
+	SchemaName    string
+	UpdateChannel chan UpdateMessage
 }
 
 // GraphQLBackendConfig encapsulates the information about one backend service
@@ -138,7 +139,10 @@ type SchemaResult struct {
 	}
 }
 
-var memoryStore = map[types.NamespacedName]*GraphQLBackendConfig{}
+type UpdateMessage struct {
+	NamespacedName types.NamespacedName
+	Config         *GraphQLBackendConfig
+}
 
 // +kubebuilder:rbac:groups=core,resources=services,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=core,resources=services/status,verbs=get;update;patch
@@ -167,6 +171,7 @@ func (r *ServiceReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	if val, ok := service.ObjectMeta.Annotations["schema.graphql.org/name"]; ok && val == r.Config.SchemaName {
 		config, err := parseGraphQLBackendConfig(service)
 		if err != nil {
+			r.Config.UpdateChannel <- UpdateMessage{NamespacedName: req.NamespacedName, Config: nil}
 			return ctrl.Result{}, err
 		}
 
@@ -183,6 +188,7 @@ func (r *ServiceReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		client := &http.Client{}
 		resp, err := client.Do(httpReq)
 		if err != nil {
+			r.Config.UpdateChannel <- UpdateMessage{NamespacedName: req.NamespacedName, Config: nil}
 			return ctrl.Result{}, err
 		}
 		defer resp.Body.Close()
@@ -192,16 +198,9 @@ func (r *ServiceReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		json.Unmarshal(body, &result)
 		config.Schema = result.Data.Service.Sdl
 
-		memoryStore[req.NamespacedName] = &config
-
-		log.Info(config.Schema)
-
-		// your logic here
-
+		r.Config.UpdateChannel <- UpdateMessage{NamespacedName: req.NamespacedName, Config: &config}
 	} else {
-		if _, ok := memoryStore[req.NamespacedName]; ok {
-			delete(memoryStore, req.NamespacedName)
-		}
+		r.Config.UpdateChannel <- UpdateMessage{NamespacedName: req.NamespacedName, Config: nil}
 	}
 
 	return ctrl.Result{}, nil
