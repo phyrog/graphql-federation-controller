@@ -30,6 +30,7 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	apierrs "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/types"
 )
 
 // ServiceReconciler reconciles a Service object
@@ -137,6 +138,8 @@ type SchemaResult struct {
 	}
 }
 
+var memoryStore = map[types.NamespacedName]*GraphQLBackendConfig{}
+
 // +kubebuilder:rbac:groups=core,resources=services,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=core,resources=services/status,verbs=get;update;patch
 
@@ -173,12 +176,12 @@ func (r *ServiceReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		payload := []byte(`{"query":"{_service{sdl}}"}`)
 		log.Info(string(payload))
 
-		req, err := http.NewRequest("POST", endpointURL, bytes.NewBuffer(payload))
-		req.Header.Set("Content-Type", "application/json")
-		req.Header.Set("Accept", "application/json")
+		httpReq, err := http.NewRequest("POST", endpointURL, bytes.NewBuffer(payload))
+		httpReq.Header.Set("Content-Type", "application/json")
+		httpReq.Header.Set("Accept", "application/json")
 
 		client := &http.Client{}
-		resp, err := client.Do(req)
+		resp, err := client.Do(httpReq)
 		if err != nil {
 			return ctrl.Result{}, err
 		}
@@ -189,9 +192,16 @@ func (r *ServiceReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		json.Unmarshal(body, &result)
 		config.Schema = result.Data.Service.Sdl
 
+		memoryStore[req.NamespacedName] = &config
+
 		log.Info(config.Schema)
 
 		// your logic here
+
+	} else {
+		if _, ok := memoryStore[req.NamespacedName]; ok {
+			delete(memoryStore, req.NamespacedName)
+		}
 	}
 
 	return ctrl.Result{}, nil
