@@ -18,6 +18,7 @@ package controllers
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"net/http"
@@ -50,6 +51,7 @@ type GraphQLBackendConfig struct {
 	Path        string
 	Endpoint    string
 	Protocol    string
+	Schema      string
 }
 
 func ignoreNotFound(err error) error {
@@ -127,6 +129,14 @@ func buildGraphQLEndpointURL(config GraphQLBackendConfig) string {
 	return config.Protocol + "://" + config.Endpoint + ":" + strconv.Itoa(int(config.Port)) + config.Path
 }
 
+type SchemaResult struct {
+	Data struct {
+		Service struct {
+			Sdl string
+		} `json:"_service"`
+	}
+}
+
 // +kubebuilder:rbac:groups=core,resources=services,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=core,resources=services/status,verbs=get;update;patch
 
@@ -175,7 +185,11 @@ func (r *ServiceReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		defer resp.Body.Close()
 
 		body, _ := ioutil.ReadAll(resp.Body)
-		log.Info(string(body))
+		var result SchemaResult
+		json.Unmarshal(body, &result)
+		config.Schema = result.Data.Service.Sdl
+
+		log.Info(config.Schema)
 
 		// your logic here
 	}
