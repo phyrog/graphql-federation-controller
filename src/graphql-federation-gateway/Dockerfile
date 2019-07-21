@@ -8,7 +8,7 @@ RUN yarn install --frozen-lockfile
 
 COPY . .
 
-EXPOSE 8080
+EXPOSE 4000
 
 CMD ["node", "main.js"]
 
