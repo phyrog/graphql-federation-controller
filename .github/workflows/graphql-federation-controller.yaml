@@ -1,8 +1,8 @@
-name: Go
+name: graphql-federation-controller
 on: [push]
 jobs:
 
-  build-graphql-federation-controller:
+  build:
     name: Build
     runs-on: ubuntu-latest
     steps:
