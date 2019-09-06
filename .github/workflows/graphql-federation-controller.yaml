@@ -1,4 +1,4 @@
-name: graphql-federation-controller
+name: Controller
 on: [push]
 jobs:
 
