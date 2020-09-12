@@ -11,6 +11,6 @@
     "express": "^4.17.1",
     "graphql": "^14.4.2",
     "minimist": "^1.2.0",
-    "node-fetch": "^2.6.0"
+    "node-fetch": "^2.6.1"
   }
 }
